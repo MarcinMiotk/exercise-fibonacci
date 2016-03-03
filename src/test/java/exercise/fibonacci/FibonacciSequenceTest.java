@@ -1,38 +1,35 @@
 package exercise.fibonacci;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import java.util.ArrayList;
+import java.util.Collection;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.rules.Stopwatch;
+import org.junit.rules.Timeout;
+import org.junit.runner.Description;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 /**
  * 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, ...
  */
+@RunWith(Parameterized.class)
 public class FibonacciSequenceTest {
 
-    static FibonacciSequence instance;
+    final FibonacciSequence instance;
 
-    public FibonacciSequenceTest() {
+    public FibonacciSequenceTest(FibonacciSequence instance) {
+        this.instance = instance;
     }
 
-    @BeforeClass
-    public static void setUpClass() {
-        instance = new FibonacciSequenceImpl();
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-        instance = null;
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
+    @Parameterized.Parameters
+    public static Collection<Object[]> possibleImplementations() {
+        ArrayList<Object[]> impls = new ArrayList<>();
+        impls.add(new Object[]{new FibonacciSequenceImpl()});
+        impls.add(new Object[]{new FibonacciSequenceStackImpl()});
+        return impls;
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -104,5 +101,24 @@ public class FibonacciSequenceTest {
     public void when12Then144() {
         assertEquals(144, instance.getFibonacciSequenceElementFromPosition(12));
     }
+
+    @Ignore
+    @Test
+    public void whenLong() {
+        assertEquals(144, instance.getFibonacciSequenceElementFromPosition(100));
+    }
+
+    @Rule
+    public Timeout globalTimeout = new Timeout(100);
+
+    @Rule
+    public Stopwatch stopWatch = new Stopwatch() {
+
+        @Override
+        protected void succeeded(long nanos, Description description) {
+            System.out.println("I took " + nanos + " to run " + description);
+        }
+
+    };
 
 }
